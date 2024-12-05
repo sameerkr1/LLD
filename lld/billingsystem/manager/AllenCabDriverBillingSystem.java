@@ -16,14 +16,27 @@ import java.util.List;
 
 public class AllenCabDriverBillingSystem {
 
+    private static AllenCabDriverBillingSystem instance;
+
     private TripService tripService;
     private DriverService driverService;
     private VehicleService vehicleService;
 
-    public AllenCabDriverBillingSystem() {
+    private AllenCabDriverBillingSystem() {
         this.tripService = new TripService();
         this.driverService = new DriverService();
         this.vehicleService = new VehicleService();
+    }
+
+    public static AllenCabDriverBillingSystem getInstance() {
+        if (instance == null) { // Check if instance is null
+            synchronized (AllenCabDriverBillingSystem.class) { // Thread-safe initialization
+                if (instance == null) {
+                    instance = new AllenCabDriverBillingSystem();
+                }
+            }
+        }
+        return instance;
     }
 
     public void addVehicle(String licenceNumber, String vehicleName, String vehicleType) {
