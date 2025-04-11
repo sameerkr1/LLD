@@ -1,0 +1,64 @@
+package org.example;
+
+import javax.sound.sampled.FloatControl;
+import java.util.concurrent.BlockingDeque;
+
+public class Main {
+
+    public static Integer number = 0;
+    public static Integer finalNumber = 20;
+    private static Object lock = new Object();
+
+    static class EvenPrinter implements Runnable {
+
+        @Override
+        public void run() {
+            synchronized (lock) {
+                while (number <= finalNumber) {
+                    if (number % 2 == 0) {
+                        System.out.println(number);
+                        number++;
+                        lock.notifyAll();
+                    }else{
+                        try {
+                            lock.wait();
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                }
+                //lock.notifyAll();
+            }
+        }
+    }
+
+    static class OddPrinter implements Runnable {
+
+        @Override
+        public void run() {
+            synchronized (lock) {
+                while (number <= finalNumber) {
+                    if (number % 2 != 0) {
+                        System.out.println(number);
+                        number++;
+                        lock.notifyAll();
+                    }else{
+                        try {
+                            lock.wait();
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                }
+                //lock.notifyAll();
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        Thread even = new Thread(new EvenPrinter());
+        Thread odd = new Thread(new OddPrinter());
+        odd.start();
+        even.start();
+    }
+}
